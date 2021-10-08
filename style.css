@@ -29,28 +29,24 @@ div.slider::-webkit-scrollbar-thumb {
 }
 
 div.slider div.atrasBoton {
-    height: 10%;
-    /* padding: 10px; */
-    position: fixed;
-    top: 50%;
     left: 0;
-    z-index: 3;
-    display: flex;
-    align-items: center;
 }
 
 div.slider div.luegoBoton {
-    height: 10%;
-    /* padding: 10px; */
-    position: fixed;
-    top: 50%;
     right: 0;
-    z-index: 3;
-    display: flex;
-    align-items: center;
 }
 
 div.luegoBoton, div.atrasBoton {
+    /* Posicion */
+    height: 10%;
+    /* padding: 10px; */
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+
+    /* Estilo */
     border-radius: 50%;
     background: #000;
     color: #fff;
