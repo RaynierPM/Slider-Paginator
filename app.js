@@ -1,11 +1,12 @@
 var slider = {
     sliderTimeOut: null,
     template: '',
+    desplazamiento: null,
     paginator: 2,
-    carrusel: document.querySelector('div.slider > div.carrusel'),
-    slider: document.querySelector('div.slider'),
-    atrasBoton: document.querySelector('div.atrasBoton'),
-    luegoBoton: document.querySelector('div.luegoBoton'),
+    carrusel: document.querySelector('.slider > .carrusel'),
+    slider: document.querySelector('.slider'),
+    atrasBoton: document.querySelector('.atrasBoton'),
+    luegoBoton: document.querySelector('.luegoBoton'),
     promise: async function (pag = 1) {
         try {
             pag = pag * 4;
@@ -29,6 +30,7 @@ var slider = {
         this.carrusel.innerHTML += this.template;
         this.template = ``;
         this.desaparecerAparecer()
+        this.calcularDesplazamiento();
     
     },
     listeners() {
@@ -44,47 +46,73 @@ var slider = {
             this.desaparecerAparecer();
         });
         
+        // Listener para los botones 
         this.slider.addEventListener('click', e => {
             if (e.target.className == 'atrasBoton') {
                 this.slider.scrollTo({
                     top: 0,
-                    left: this.slider.scrollLeft - (this.slider.clientWidth /2),
+                    left: this.slider.scrollLeft - this.desplazamiento,
                     behavior: 'smooth'
                 });
                 
             }else if(e.target.className == 'luegoBoton') {
                 this.slider.scrollTo({
                     top: 0,
-                    left: this.slider.scrollLeft + (this.slider.clientWidth /2),
+                    left: this.slider.scrollLeft + this.desplazamiento,
                     behavior: 'smooth'
                 });
             }   
 
         });
+
+        window.addEventListener('resize', () => {
+            this.calcularDesplazamiento();
+            this.desaparecerAparecer();
+        });
     },
     desaparecerAparecer() {
-        if (this.slider.scrollLeft <= 0){
+        // Si no ha elementos en el slider o el tamanio de la pantalla es muy pequenio se eliminan los botones
+        if (this.slider.children.length == 0 || window.innerWidth <= 768) {
             this.atrasBoton.style.display = 'none';
-        }else {
-            this.atrasBoton.style.display = 'flex';
-        }
-
-        if (this.slider.scrollLeft >= (this.slider.scrollWidth - this.slider.clientWidth)){
             this.luegoBoton.style.display = 'none';
         }else {
-            this.luegoBoton.style.display = 'flex';
+
+            // Si el carrusel llega la borde desaparece el boton del respectivo lado
+            if (this.slider.scrollLeft <= 0){
+                this.atrasBoton.style.display = 'none';
+            }else {
+                this.atrasBoton.style.display = 'flex';
+            }
+            
+            if (this.slider.scrollLeft >= (this.slider.scrollWidth - this.slider.clientWidth)){
+                this.luegoBoton.style.display = 'none';
+            }else {
+                this.luegoBoton.style.display = 'flex';
+            }
         }
+
+        
     },primeraEjecucion() {
         this.consulta(this.paginator);
         this.paginator++;
         this.listeners()
+    },
+    calcularDesplazamiento() {
+        // Si la pantalla es de 768px o mas, el desplazamiento del slider es de 3 elementos y mas 3 veces el margen izquierdo (10px)
+        if (window.innerWidth >= 768) {
+            this.desplazamiento = (document.querySelector('.carrusel > .element').clientWidth + 10) * 3;
+
+
+        // Si la pantalla es de 576px o mas, el desplazamiento del slider es de 2 elementos y mas 2 veces el margen izquierdo (10px)
+        }else if (window.innerWidth >= 576) {
+            this.desplazamiento = (document.querySelector('.carrusel > .element').clientWidth + 10) * 2;
+
+
+        // Si la pantalla es de 576px o mas, el desplazamiento del slider es de 1 elemento y mas 1 vez el margen izquierdo (10px)
+        }else {
+            this.desplazamiento = document.querySelector('.carrusel > .element').clientWidth + 10;
+        }
     }
 }
 
 slider.primeraEjecucion();
-
-
-
-
-
-
