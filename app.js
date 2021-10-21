@@ -3,10 +3,11 @@ var slider = {
     template: '',
     desplazamiento: null,
     paginator: 2,
-    carrusel: document.querySelector('.slider > .carrusel'),
+    carrusel: document.querySelector('.carrusel'),
     slider: document.querySelector('.slider'),
-    atrasBoton: document.querySelector('.atrasBoton'),
-    luegoBoton: document.querySelector('.luegoBoton'),
+    contenedorCarrusel: document.querySelector('.contenedor-carrusel'),
+    atrasBoton: document.querySelector('.botones > .atras'),
+    luegoBoton: document.querySelector('.botones >.luego'),
     promise: async function (pag = 1) {
         try {
             pag = pag * 4;
@@ -34,7 +35,7 @@ var slider = {
     
     },
     listeners() {
-        this.slider.addEventListener('scroll', e => {
+        this.contenedorCarrusel.addEventListener('scroll', e => {
     
             if (e.target.scrollLeft >= (e.target.scrollWidth - e.target.clientWidth) - (e.target.clientWidth/2)) {
                 clearTimeout(this.sliderTimeOut);
@@ -48,17 +49,17 @@ var slider = {
         
         // Listener para los botones 
         this.slider.addEventListener('click', e => {
-            if (e.target.className == 'atrasBoton') {
-                this.slider.scrollTo({
+            if (e.target.classList.contains('atras')) {
+                this.contenedorCarrusel.scrollTo({
                     top: 0,
-                    left: this.slider.scrollLeft - this.desplazamiento,
+                    left: this.contenedorCarrusel.scrollLeft - this.desplazamiento,
                     behavior: 'smooth'
                 });
                 
-            }else if(e.target.className == 'luegoBoton') {
-                this.slider.scrollTo({
+            }else if(e.target.classList.contains('luego')) {
+                this.contenedorCarrusel.scrollTo({
                     top: 0,
-                    left: this.slider.scrollLeft + this.desplazamiento,
+                    left: this.contenedorCarrusel.scrollLeft + this.desplazamiento,
                     behavior: 'smooth'
                 });
             }   
@@ -68,23 +69,25 @@ var slider = {
         window.addEventListener('resize', () => {
             this.calcularDesplazamiento();
             this.desaparecerAparecer();
+            clearTimeout(this.sliderTimeOut);
+            this.sliderTimeOut = setTimeout(() => {this.orientar()}, 250);
         });
     },
     desaparecerAparecer() {
         // Si no ha elementos en el slider o el tamanio de la pantalla es muy pequenio se eliminan los botones
-        if (this.slider.children.length == 0 || window.innerWidth <= 768) {
+        if (this.carrusel.children.length == 0 || window.innerWidth <= 768) {
             this.atrasBoton.style.display = 'none';
             this.luegoBoton.style.display = 'none';
         }else {
 
             // Si el carrusel llega la borde desaparece el boton del respectivo lado
-            if (this.slider.scrollLeft <= 0){
+            if (this.contenedorCarrusel.scrollLeft <= 0){
                 this.atrasBoton.style.display = 'none';
             }else {
                 this.atrasBoton.style.display = 'flex';
             }
             
-            if (this.slider.scrollLeft >= (this.slider.scrollWidth - this.slider.clientWidth)){
+            if (this.contenedorCarrusel.scrollLeft >= (this.contenedorCarrusel.scrollWidth - this.contenedorCarrusel.clientWidth)){
                 this.luegoBoton.style.display = 'none';
             }else {
                 this.luegoBoton.style.display = 'flex';
@@ -112,6 +115,21 @@ var slider = {
         }else {
             this.desplazamiento = document.querySelector('.carrusel > .element').clientWidth + 10;
         }
+    },
+    orientar() {
+        let elements = document.querySelectorAll('.carrusel .element');
+        let i = 0;
+        elements.forEach(element => {
+            let position = element.getClientRects();
+            if(position[0].x <= 0 ) {
+                this.contenedorCarrusel.scrollTo({
+                    top: 0,
+                    left: (this.contenedorCarrusel.scrollLeft + position[0].left) - 10,
+                    behavior: 'smooth'
+                });
+                return;
+            }        
+        });
     }
 }
 
